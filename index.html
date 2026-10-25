@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>PLUG·IN — 브라우저 코디네이션 매거진</title>
+<style>
+@page { size: 210mm 270mm; margin: 0; }
+:root{
+  --paper:#F3EEE6; --ink:#151413; --mute:#6E675F; --line:#CFC6BA;
+  --red:#A8231C; --blush:#E8D6CC; --camel:#B4875A; --olive:#5E6447; --navy:#23304A;
+  --serif:'Noto Serif CJK KR', serif; --sans:'Noto Sans CJK KR', sans-serif; --lat:'Inter', 'Noto Sans CJK KR', sans-serif;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ background:var(--paper); color:var(--ink); }
+body{ font-family:var(--sans); font-weight:350; font-size:9.6pt; line-height:1.75; word-break:keep-all; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+/* ===== page frame ===== */
+.page{ width:210mm; height:270mm; position:relative; overflow:hidden; page-break-after:always; background:var(--paper); }
+.page:last-child{ page-break-after:auto; }
+.pad{ position:absolute; inset:16mm 15mm 18mm 15mm; }
+.folio{ position:absolute; bottom:8mm; left:15mm; right:15mm; display:flex; justify-content:space-between; font-family:var(--lat); font-size:6.5pt; letter-spacing:.18em; text-transform:uppercase; color:var(--mute); }
+.folio b{ color:var(--ink); font-weight:600; }
+.dark .folio, .red .folio{ color:rgba(255,255,255,.6); }
+.dark .folio b, .red .folio b{ color:#fff; }
+
+.kicker{ font-family:var(--lat); font-size:7pt; letter-spacing:.32em; text-transform:uppercase; font-weight:600; }
+.serif{ font-family:var(--serif); }
+h1,h2,h3{ font-family:var(--serif); font-weight:900; line-height:1.15; letter-spacing:-.01em; }
+hr.rule{ border:0; border-top:.6pt solid var(--ink); }
+hr.thin{ border:0; border-top:.4pt solid var(--line); }
+.red-t{ color:var(--red); }
+p + p{ margin-top:.7em; }
+
+/* ===== browser illustration (shared) ===== */
+.browser{ position:relative; background:#fff; border-radius:3.5mm; box-shadow:0 2mm 6mm rgba(0,0,0,.18); overflow:hidden; }
+.browser .bar{ height:9mm; background:#E9E4DC; display:flex; align-items:center; padding:0 3.5mm; gap:1.6mm; border-bottom:.4pt solid var(--line); }
+.browser .dot{ width:2.2mm; height:2.2mm; border-radius:50%; background:#C9C0B4; display:inline-block; }
+.browser .url{ flex:1; height:4.6mm; margin:0 3mm; border-radius:2.3mm; background:#fff; font-family:var(--lat); font-size:5.5pt; color:var(--mute); line-height:4.6mm; padding-left:3mm; }
+.browser .ext{ width:4.6mm; height:4.6mm; border-radius:50%; display:inline-block; font-family:var(--lat); font-size:5pt; font-weight:700; color:#fff; text-align:center; line-height:4.6mm; }
+
+/* ================= COVER ================= */
+.cover{ background:var(--paper); }
+.cover .mast{ position:absolute; top:11mm; left:0; right:0; text-align:center; }
+.cover .mast .top{ font-family:var(--lat); font-size:6.8pt; letter-spacing:.4em; display:flex; justify-content:space-between; padding:0 15mm; text-transform:uppercase; }
+.cover .mast h1{ font-family:var(--serif); font-weight:900; font-size:96pt; letter-spacing:-.03em; line-height:1; margin-top:2mm; }
+.cover .mast h1 span{ color:var(--red); }
+.cover .mast .sub{ font-family:var(--serif); font-size:10pt; letter-spacing:.5em; margin-top:2mm; }
+.cover .stage{ position:absolute; top:76mm; left:66mm; width:126mm; height:132mm; }
+.cover .stage .arch{ position:absolute; inset:0; border-radius:63mm 63mm 0 0; background:linear-gradient(180deg,#E8D6CC 0%, #D9BFAF 100%); }
+.cover .stage .browser{ position:absolute; left:16mm; right:16mm; top:52mm; height:74mm; }
+.cover .stage .page-mock{ padding:5mm; }
+.mock-line{ height:2mm; background:#EEE9E1; border-radius:1mm; margin-bottom:2.2mm; }
+.cover .necklace{ position:absolute; left:14mm; right:14mm; top:12mm; height:32mm; border-bottom:.8pt solid var(--camel); border-radius:0 0 50% 50%; }
+.cover .charm{ position:absolute; width:11mm; height:11mm; border-radius:50%; color:#fff; font-family:var(--lat); font-weight:700; font-size:7pt; text-align:center; line-height:11mm; box-shadow:0 1mm 2mm rgba(0,0,0,.25); border:.8mm solid #fff; }
+.cover .lines{ position:absolute; left:15mm; top:86mm; width:44mm; }
+.cover .lines.r{ left:auto; right:15mm; text-align:right; top:120mm; }
+.cover .cl{ margin-bottom:10mm; padding-top:2.5mm; border-top:.6pt solid var(--ink); }
+.cover .cl .n{ font-family:var(--lat); font-size:6.5pt; letter-spacing:.25em; color:var(--red); font-weight:700; }
+.cover .cl .t{ font-family:var(--serif); font-weight:900; font-size:13pt; line-height:1.25; }
+.cover .cl .d{ font-size:7pt; color:var(--mute); line-height:1.5; margin-top:1mm; }
+.cover .bottom{ position:absolute; left:15mm; right:15mm; bottom:12mm; display:flex; justify-content:space-between; align-items:flex-end; }
+.cover .bottom .big{ font-family:var(--serif); font-weight:900; font-size:22pt; line-height:1.15; }
+.cover .bottom .big em{ font-style:normal; color:var(--red); }
+.barcode{ display:flex; gap:.5mm; height:11mm; align-items:stretch; }
+.barcode i{ display:block; background:var(--ink); }
+.cover .meta{ font-family:var(--lat); font-size:6pt; letter-spacing:.15em; text-align:right; margin-top:1.5mm; }
+
+/* ================= CONTENTS ================= */
+.toc h2{ font-size:44pt; letter-spacing:-.02em; }
+.toc .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10mm; margin-top:8mm; }
+.toc ol{ list-style:none; }
+.toc ol li{ display:flex; gap:4mm; padding:3.4mm 0; border-top:.5pt solid var(--ink); }
+.toc ol li:last-child{ border-bottom:.5pt solid var(--ink); }
+.toc ol li .num{ font-family:var(--serif); font-weight:900; font-size:20pt; line-height:1; width:12mm; }
+.toc ol li:nth-child(2n) .num{ color:var(--red); }
+.toc ol li a{ color:inherit; text-decoration:none; }
+.toc ol li .tt{ font-family:var(--serif); font-weight:700; font-size:11pt; line-height:1.3; }
+.toc ol li .ds{ font-size:7.5pt; color:var(--mute); line-height:1.5; margin-top:1mm; }
+.toc ol li .pg{ margin-left:auto; font-family:var(--lat); font-size:7pt; font-weight:600; }
+.letter{ background:var(--ink); color:var(--paper); padding:7mm; position:relative; }
+.letter .kicker{ color:var(--blush); }
+.letter h3{ font-size:16pt; margin:3mm 0 4mm; color:#fff; }
+.letter p{ font-size:8.6pt; line-height:1.85; color:#E6DED3; }
+.letter .sign{ margin-top:5mm; font-family:var(--serif); font-size:9pt; text-align:right; color:#fff; }
+.toc .tpo{ margin-top:6mm; font-family:var(--serif); font-size:9pt; line-height:1.7; border-left:1.2mm solid var(--red); padding-left:4mm; }
+
+/* ================= OPENERS ================= */
+.dark{ background:var(--ink); color:var(--paper); }
+.red{ background:var(--red); color:#fff; }
+.opener .huge{ position:absolute; font-family:var(--serif); font-weight:900; line-height:.8; letter-spacing:-.05em; }
+.opener .label{ position:absolute; left:15mm; top:16mm; }
+.opener .title{ position:absolute; left:15mm; right:15mm; bottom:34mm; }
+.opener .title h2{ font-size:40pt; line-height:1.12; }
+.opener .title .en{ font-family:var(--lat); font-size:8pt; letter-spacing:.4em; margin-bottom:4mm; text-transform:uppercase; }
+.opener .title p{ font-family:var(--serif); font-size:11pt; line-height:1.7; margin-top:6mm; max-width:120mm; opacity:.85; }
+
+/* ================= ARTICLE ================= */
+.head{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:.6pt solid var(--ink); padding-bottom:2mm; }
+.head .kicker{ color:var(--red); }
+.head .sec{ font-family:var(--lat); font-size:6.5pt; letter-spacing:.2em; color:var(--mute); text-transform:uppercase; }
+.article h2{ font-size:28pt; margin-top:6mm; }
+.deck{ font-family:var(--serif); font-size:11pt; line-height:1.65; margin-top:4mm; color:#3A3632; }
+.cols{ column-count:2; column-gap:7mm; margin-top:6mm; text-align:justify; }
+.cols p{ break-inside:auto; }
+.dropcap::first-letter{ float:left; font-family:var(--serif); font-weight:900; font-size:34pt; line-height:.9; margin:1mm 2mm 0 0; color:var(--red); }
+.pull{ font-family:var(--serif); font-weight:700; font-size:14pt; line-height:1.45; border-top:1.2pt solid var(--ink); border-bottom:.4pt solid var(--ink); padding:4mm 0; margin:6mm 0; }
+.pull .q{ color:var(--red); }
+.glossary{ background:#fff; padding:5mm; margin-top:6mm; box-shadow:1mm 1mm 0 var(--ink); border:.6pt solid var(--ink); }
+.glossary dt{ font-family:var(--serif); font-weight:900; font-size:9.5pt; margin-top:2.5mm; }
+.glossary dt:first-of-type{ margin-top:2mm; }
+.glossary dd{ font-size:8pt; color:#3A3632; line-height:1.6; }
+.vs{ display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:6mm; border:.6pt solid var(--ink); }
+.vs > div{ padding:5mm; }
+.vs > div:first-child{ border-right:.6pt solid var(--ink); background:#E7E1D8; }
+.vs h4{ font-family:var(--serif); font-weight:900; font-size:12pt; margin:1mm 0 2mm; }
+.vs .kicker{ font-size:6.2pt; }
+.vs ul{ list-style:none; font-size:8pt; line-height:1.65; }
+.vs li{ padding-left:3.5mm; position:relative; }
+.vs li::before{ content:""; position:absolute; left:0; top:2.1mm; width:1.4mm; height:1.4mm; background:var(--ink); }
+.vs > div:last-child li::before{ background:var(--red); border-radius:50%; }
+
+/* anatomy */
+.anatomy{ position:relative; height:118mm; margin-top:6mm; }
+.anatomy .browser{ position:absolute; left:34mm; right:34mm; top:10mm; height:92mm; }
+.anatomy .popup{ position:absolute; right:3mm; top:11mm; width:36mm; background:#fff; border:.5pt solid var(--line); border-radius:2mm; box-shadow:0 1.5mm 4mm rgba(0,0,0,.2); padding:3mm; z-index:3; }
+.anatomy .popup .ttl{ font-family:var(--lat); font-weight:700; font-size:6pt; letter-spacing:.1em; }
+.anatomy .popup .sw{ margin-top:2mm; display:flex; justify-content:space-between; font-size:6pt; align-items:center; }
+.anatomy .popup .tg{ width:6mm; height:3.2mm; border-radius:1.6mm; background:var(--olive); position:relative; }
+.anatomy .popup .tg::after{ content:""; position:absolute; right:.4mm; top:.4mm; width:2.4mm; height:2.4mm; border-radius:50%; background:#fff; }
+.anatomy .overlay{ position:absolute; left:4mm; right:42mm; top:14mm; bottom:5mm; border:.9pt dashed var(--red); border-radius:1.5mm; }
+.anatomy .callout{ position:absolute; width:40mm; font-size:7.4pt; line-height:1.55; }
+.anatomy .callout .no{ display:inline-block; width:5.5mm; height:5.5mm; border-radius:50%; background:var(--red); color:#fff; font-family:var(--lat); font-weight:700; font-size:6.5pt; text-align:center; line-height:5.5mm; margin-right:1.2mm; }
+.anatomy .callout b{ font-family:var(--serif); font-weight:900; font-size:9pt; }
+.anatomy .pin{ position:absolute; width:5.5mm; height:5.5mm; border-radius:50%; background:var(--red); color:#fff; font-family:var(--lat); font-weight:700; font-size:6.5pt; text-align:center; line-height:5.5mm; z-index:5; box-shadow:0 0 0 .8mm var(--paper); }
+.code{ font-family:'DejaVu Sans Mono', monospace; font-size:6.6pt; line-height:1.6; background:var(--ink); color:#EDE6DA; padding:4mm; border-radius:1.5mm; white-space:pre; }
+.code .k{ color:#E3A79F; } .code .s{ color:#C9D6A3; } .code .c{ color:#8C857C; }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; margin-top:5mm; }
+.cap{ font-family:var(--lat); font-size:6.2pt; letter-spacing:.2em; text-transform:uppercase; color:var(--mute); margin-bottom:1.5mm; }
+
+/* before / after */
+.ba{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; margin-top:7mm; }
+.ba .browser{ height:64mm; }
+.ba .tag{ font-family:var(--lat); font-size:6.5pt; letter-spacing:.3em; font-weight:700; margin-bottom:2mm; }
+.ba .site{ padding:4mm; height:55mm; }
+.ba .site h5{ font-family:var(--serif); font-size:9pt; margin-bottom:2mm; }
+.ba .site .ad{ height:9mm; border-radius:1mm; background:repeating-linear-gradient(45deg,#F4C542 0 2mm,#F7D873 2mm 4mm); font-family:var(--lat); font-size:5.5pt; font-weight:700; text-align:center; line-height:9mm; margin:2mm 0; }
+.ba .after .site{ background:#1C1B1A; color:#E8E2D8; }
+.ba .after .site .mock-line{ background:#3A3836; }
+.ba .after .bar{ background:#2A2928; border-color:#3a3836; }
+.ba .after .url{ background:#3A3836; color:#aaa; }
+.steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:5mm; margin-top:8mm; }
+.steps article{ border-top:1.2pt solid var(--ink); padding-top:3mm; }
+.steps .n{ font-family:var(--serif); font-weight:900; font-size:24pt; line-height:1; color:var(--red); }
+.steps h4{ font-family:var(--serif); font-weight:900; font-size:10.5pt; margin:2mm 0 1.5mm; }
+.steps p{ font-size:7.8pt; line-height:1.65; }
+
+/* ================= LOOKBOOK ================= */
+.look{ display:grid; grid-template-columns:52mm 1fr; gap:7mm; padding:6.5mm 0; border-bottom:.5pt solid var(--ink); }
+.look:last-child{ border-bottom:0; }
+.look .visual{ position:relative; height:58mm; background:var(--c, #ddd); overflow:hidden; }
+.look .visual .no{ position:absolute; left:3mm; top:2mm; font-family:var(--serif); font-weight:900; font-size:36pt; color:rgba(255,255,255,.9); line-height:1; }
+.look .visual .icon{ position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); width:24mm; height:24mm; border-radius:6mm; background:#fff; box-shadow:0 2mm 5mm rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; }
+.look .visual .kw{ position:absolute; left:0; right:0; bottom:3mm; text-align:center; font-family:var(--lat); font-size:6pt; letter-spacing:.3em; color:#fff; font-weight:600; }
+.look .cat{ font-family:var(--lat); font-size:6.5pt; letter-spacing:.25em; font-weight:700; color:var(--red); text-transform:uppercase; }
+.look h3{ font-size:17pt; margin:1mm 0 1mm; }
+.look .style{ font-family:var(--serif); font-size:9.5pt; color:var(--mute); margin-bottom:2.5mm; }
+.look p{ font-size:8.3pt; line-height:1.72; }
+.look .spec{ display:flex; gap:2mm; margin-top:3mm; flex-wrap:wrap; }
+.look .spec span{ font-size:6.8pt; border:.5pt solid var(--ink); padding:.3mm 2.2mm; border-radius:3mm; }
+.look .spec span.warn{ border-color:var(--red); color:var(--red); }
+.look .note{ margin-top:2.5mm; font-size:7.2pt; color:var(--mute); line-height:1.55; padding-left:3mm; border-left:.8mm solid var(--camel); }
+
+/* TPO table */
+table.tpo{ width:100%; border-collapse:collapse; margin-top:6mm; font-size:8.2pt; }
+table.tpo th, table.tpo td{ border-bottom:.5pt solid var(--line); padding:2.8mm 2mm; text-align:left; vertical-align:top; line-height:1.55; }
+table.tpo thead th{ font-family:var(--lat); font-size:6.5pt; letter-spacing:.2em; text-transform:uppercase; border-bottom:1.2pt solid var(--ink); color:var(--mute); }
+table.tpo tbody th{ font-family:var(--serif); font-weight:900; font-size:10pt; width:30mm; border-right:.5pt solid var(--line); }
+table.tpo td.it{ font-family:var(--serif); font-weight:700; width:38mm; }
+.rules{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin-top:8mm; background:var(--ink); color:var(--paper); }
+.rules > div{ padding:5mm; border-right:.5pt solid #444; }
+.rules > div:last-child{ border-right:0; }
+.rules .n{ font-family:var(--serif); font-size:22pt; font-weight:900; color:var(--blush); line-height:1; }
+.rules h4{ font-family:var(--serif); font-size:10.5pt; margin:2mm 0 1.5mm; color:#fff; }
+.rules p{ font-size:7.6pt; line-height:1.65; color:#D8D0C4; }
+
+/* ================= RED FLAGS ================= */
+.flag{ display:grid; grid-template-columns:22mm 1fr; gap:5mm; padding:5mm 0; border-bottom:.5pt solid var(--ink); }
+.flag:last-of-type{ border-bottom:0; }
+.flag .n{ font-family:var(--serif); font-weight:900; font-size:40pt; line-height:.9; color:var(--red); }
+.flag h3{ font-size:14pt; }
+.flag .sig{ display:inline-block; font-size:7pt; background:var(--red); color:#fff; padding:.2mm 2mm; margin:1.5mm 0 2mm; font-weight:500; }
+.flag p{ font-size:8.3pt; line-height:1.72; }
+.flag .chk{ margin-top:2mm; font-size:7.6pt; color:#3A3632; }
+.flag .chk b{ font-family:var(--serif); }
+.perm{ margin-top:2.5mm; background:#fff; border:.5pt solid var(--line); border-radius:2mm; padding:3mm 4mm; box-shadow:0 1mm 3mm rgba(0,0,0,.08); font-size:7.6pt; width:118mm; }
+.perm .pt{ font-weight:700; margin-bottom:1.5mm; }
+.perm ul{ padding-left:4mm; color:#3A3632; line-height:1.6; }
+.perm .btns{ text-align:right; margin-top:2mm; }
+.perm .btns span{ display:inline-block; font-size:6.5pt; padding:.6mm 3mm; border-radius:3mm; border:.5pt solid var(--line); margin-left:1.5mm; }
+.perm .btns span:last-child{ background:var(--navy); color:#fff; border-color:var(--navy); }
+
+.dresser{ display:grid; grid-template-columns:1fr 1fr; gap:6mm; margin-top:6mm; }
+.listing{ background:#fff; border:.6pt solid var(--ink); padding:4mm; position:relative; }
+.listing .stamp{ position:absolute; right:-2mm; top:-4mm; transform:rotate(8deg); font-family:var(--lat); font-weight:800; font-size:8pt; letter-spacing:.2em; padding:1mm 3mm; border:1.2pt solid; background:var(--paper); }
+.listing.best .stamp{ color:var(--olive); }
+.listing.worst .stamp{ color:var(--red); }
+.listing .hd{ display:flex; gap:3mm; align-items:center; }
+.listing .ic{ width:11mm; height:11mm; border-radius:2.5mm; flex:none; }
+.listing .nm{ font-family:var(--serif); font-weight:900; font-size:10pt; line-height:1.3; }
+.listing .by{ font-size:6.6pt; color:var(--mute); }
+.listing dl{ display:grid; grid-template-columns:20mm 1fr; font-size:7.2pt; margin-top:3mm; row-gap:1mm; }
+.listing dt{ color:var(--mute); }
+.listing.worst dd.x{ color:var(--red); font-weight:700; }
+
+/* checklist form */
+form.check fieldset{ border:1.2pt solid var(--ink); padding:2mm 6mm 5mm; margin-top:6mm; background:#fff; }
+form.check legend{ font-family:var(--serif); font-weight:900; font-size:12pt; padding:0 3mm; }
+form.check .item{ display:grid; grid-template-columns:7mm 1fr; padding:2.6mm 0; border-bottom:.4pt solid var(--line); align-items:start; }
+form.check .item:last-child{ border-bottom:0; }
+form.check input[type="checkbox"]{ width:4mm; height:4mm; margin-top:.8mm; accent-color:var(--red); }
+form.check label{ font-size:8.4pt; line-height:1.6; }
+form.check label b{ font-family:var(--serif); font-weight:900; }
+.care{ display:grid; grid-template-columns:repeat(2,1fr); gap:5mm; margin-top:6mm; }
+.care article{ background:var(--blush); padding:5mm; }
+.care h4{ font-family:var(--serif); font-weight:900; font-size:11pt; margin-bottom:2mm; }
+.care ul{ padding-left:4mm; font-size:7.9pt; line-height:1.7; }
+
+/* ================= COLOPHON ================= */
+.colophon .big{ font-family:var(--serif); font-weight:900; font-size:30pt; line-height:1.25; }
+.colophon .big span{ color:var(--red); }
+.credits{ display:grid; grid-template-columns:1fr 1fr; gap:8mm; margin-top:10mm; }
+.credits dl{ font-size:8pt; line-height:1.7; }
+.credits dt{ font-family:var(--lat); font-size:6.3pt; letter-spacing:.25em; text-transform:uppercase; color:var(--mute); margin-top:4mm; }
+.credits dd{ font-family:var(--serif); font-weight:700; font-size:9.5pt; }
+
+.back{ background:var(--ink); color:var(--paper); }
+</style>
+</head>
+<body>
+
+<!-- ======================= 01 COVER ======================= -->
+<section class="page cover">
+  <header class="mast">
+    <div class="top"><span>Vol.01</span><span>Browser Coordination Magazine</span><span>2026 F/W</span></div>
+    <h1>PLUG<span>·</span>IN</h1>
+    <p class="sub">브 라 우 저 를 입 히 는 법</p>
+  </header>
+
+  <div class="stage">
+    <div class="arch"></div>
+    <div class="browser">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">https://your-everyday.web</span>
+        <span class="ext" style="background:#A8231C">U</span><span class="ext" style="background:#23304A">B</span><span class="ext" style="background:#151413">D</span></div>
+      <div class="page-mock">
+        <div class="mock-line" style="width:55%;height:4mm;background:#DCD3C7"></div>
+        <div class="mock-line" style="width:90%"></div><div class="mock-line" style="width:80%"></div>
+        <div class="mock-line" style="width:86%"></div><div class="mock-line" style="width:60%"></div>
+        <div style="display:flex;gap:3mm;margin-top:4mm">
+          <div style="flex:1;height:22mm;background:#EFE7DD;border-radius:1mm"></div>
+          <div style="flex:1;height:22mm;background:#E5DCCF;border-radius:1mm"></div>
+        </div>
+      </div>
+    </div>
+    <div class="necklace"></div>
+    <span class="charm" style="left:15mm;top:16mm;background:#A8231C">U</span>
+    <span class="charm" style="left:31mm;top:33mm;background:#23304A">B</span>
+    <span class="charm" style="left:57.5mm;top:39mm;background:#151413">D</span>
+    <span class="charm" style="right:31mm;top:33mm;background:#5E6447">T</span>
+    <span class="charm" style="right:15mm;top:16mm;background:#B4875A">C</span>
+  </div>
+
+  <div class="lines">
+    <div class="cl"><div class="n">01 — BASICS</div><div class="t">플러그인이란 무엇인가</div><div class="d">브라우저의 기본 의상과 액세서리를 구분하는 법</div></div>
+    <div class="cl"><div class="n">02 — CURATION</div><div class="t">에디터 픽,<br>필수 확장 6</div><div class="d">미니멀리스트를 위한 데일리 코디</div></div>
+    <div class="cl"><div class="n">03 — RED FLAGS</div><div class="t">설치 전에<br>꼭 볼 위험 신호 7</div><div class="d">워스트 드레서가 되지 않는 체크리스트</div></div>
+  </div>
+
+  <footer class="bottom">
+    <div class="big">액세서리는<br><em>덜어낼수록</em> 세련된다</div>
+    <div>
+      <div class="barcode">
+        <i style="width:.5mm"></i><i style="width:1.2mm"></i><i style="width:.4mm"></i><i style="width:.8mm"></i><i style="width:.4mm"></i><i style="width:1.4mm"></i><i style="width:.5mm"></i><i style="width:.9mm"></i><i style="width:.4mm"></i><i style="width:1.1mm"></i><i style="width:.6mm"></i><i style="width:.4mm"></i><i style="width:1.3mm"></i><i style="width:.5mm"></i><i style="width:.8mm"></i><i style="width:.4mm"></i><i style="width:1mm"></i>
+      </div>
+      <div class="meta">EDITED BY 조서형 · 2601981</div>
+    </div>
+  </footer>
+</section>
+
+<!-- ======================= 02 CONTENTS ======================= -->
+<section class="page toc">
+  <div class="pad">
+    <div class="head"><span class="kicker">Contents</span><span class="sec">PLUG·IN Vol.01</span></div>
+    <h2 style="margin-top:6mm">이번 호의<br>코디 노트</h2>
+    <div class="grid">
+      <nav>
+        <ol>
+          <li><span class="num">01</span><div><a href="#basics" class="tt">플러그인이란 무엇인가</a><div class="ds">기본 의상(브라우저)과 액세서리(확장 프로그램). 플러그인과 확장 프로그램은 어떻게 다를까.</div></div><span class="pg">P.03</span></li>
+          <li><span class="num">02</span><div><a href="#curation" class="tt">나만의 필수 확장 프로그램 큐레이션</a><div class="ds">에디터가 매일 착용하는 6가지 아이템과 상황별(TPO) 코디 공식.</div></div><span class="pg">P.07</span></li>
+          <li><span class="num">03</span><div><a href="#redflags" class="tt">확장 프로그램 설치 전 확인할 위험 신호</a><div class="ds">권한, 개발자, 리뷰, 배포 경로까지. 설치 버튼을 누르기 전 7가지 체크 포인트.</div></div><span class="pg">P.11</span></li>
+          <li><span class="num">04</span><div><a href="#colophon" class="tt">Colophon</a><div class="ds">이 책을 만든 사람과 도구.</div></div><span class="pg">P.15</span></li>
+        </ol>
+        <p class="tpo">패션에는 TPO(시간·장소·상황)가 있다.<br>브라우저에도 있다. 수업 시간, 과제 마감 전날, 늦은 밤의 웹서핑 — 상황마다 필요한 액세서리는 다르다.</p>
+      </nav>
+      <aside class="letter">
+        <span class="kicker">Editor's Letter</span>
+        <h3>오늘, 당신의 브라우저는<br>무엇을 입었나요?</h3>
+        <p>우리는 하루의 대부분을 브라우저 안에서 보낸다. 강의 자료를 내려받고, 과제를 제출하고, 쇼핑을 하고, 친구와 대화한다. 그런데 정작 매일 입는 이 '옷'을 어떻게 꾸미고 있는지는 잘 생각하지 않는다.</p>
+        <p>확장 프로그램은 브라우저의 액세서리다. 잘 고른 하나는 하루를 바꾸지만, 출처를 모르는 하나는 내 정보를 통째로 내줄 수도 있다. 이번 호는 그 사이에서 균형 잡는 법을 이야기한다.</p>
+        <p>무엇을 더할지보다 무엇을 덜어낼지. 그것이 이번 시즌의 키워드다.</p>
+        <p class="sign">— Editor 조서형</p>
+      </aside>
+    </div>
+  </div>
+  <div class="folio"><span><b>02</b> · Contents</span><span>PLUG·IN</span></div>
+</section>
+
+<!-- ======================= 03 OPENER 1 ======================= -->
+<section class="page opener dark" id="basics">
+  <div class="label kicker" style="color:var(--blush)">Chapter 01 · The Basics</div>
+  <div class="huge" style="right:-6mm;top:6mm;font-size:250pt;color:#262422">01</div>
+  <div style="position:absolute;left:15mm;top:70mm;width:70mm;height:70mm;border-radius:50%;border:.6pt solid #5a554f"></div>
+  <div style="position:absolute;left:35mm;top:90mm;width:70mm;height:70mm;border-radius:50%;background:linear-gradient(135deg,#A8231C,#5f1410)"></div>
+  <div class="title">
+    <div class="en" style="color:var(--blush)">What is a plug-in?</div>
+    <h2>플러그인이란<br>무엇인가</h2>
+    <p>"브라우저가 매일 입는 기본 의상이라면,<br>확장 프로그램은 그 위에 더하는 액세서리다."</p>
+  </div>
+  <div class="folio"><span><b>03</b> · Chapter 01</span><span>The Basics</span></div>
+</section>
+
+<!-- ======================= 04 BASICS: DEFINITION ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">01 · Definition</span><span class="sec">The Basics</span></header>
+    <h2>기본 의상과 액세서리</h2>
+    <p class="deck">크롬, 엣지, 파이어폭스 같은 브라우저는 그 자체로 완성된 옷이다. 여기에 기능 하나를 덧붙이는 작은 프로그램, 그것이 우리가 흔히 '플러그인'이라 부르는 확장 프로그램이다.</p>
+    <div class="cols">
+      <p class="dropcap">브라우저는 웹 페이지를 열고, 읽고, 보여 주는 일을 한다. 하지만 사람마다 필요한 기능은 다르다. 광고 없는 화면을 원하는 사람, 밤에도 눈이 편한 어두운 화면을 원하는 사람, 웹 페이지에 쓰인 글꼴과 색상을 바로 알고 싶은 디자인 전공생까지. 브라우저 회사가 이 모든 기능을 기본으로 넣을 수는 없다. 그래서 브라우저는 '덧붙일 수 있는 구멍'을 열어 두었다. 그 자리에 끼우는 부품이 확장 프로그램이다.</p>
+      <p>일상에서는 '플러그인'과 '확장 프로그램'을 같은 뜻으로 쓰는 경우가 많다. 그러나 엄밀히는 다르다. 예전의 플러그인은 플래시(Flash) 플레이어처럼 브라우저 바깥에서 만든 별도 프로그램을 브라우저 안에 끼워 넣는 방식이었다. 컴퓨터 깊숙한 곳까지 접근할 수 있어 강력했지만, 그만큼 보안 사고의 통로가 되기 쉬웠다. 결국 주요 브라우저는 이런 방식의 플러그인 지원을 거둬들였고, 플래시도 2020년 말 공식 지원이 끝났다.</p>
+      <p>지금 우리가 설치하는 것은 대부분 <b>확장 프로그램(Extension)</b>이다. 흥미로운 점은 확장 프로그램이 우리가 수업에서 배운 <b>HTML, CSS, 자바스크립트</b>로 만들어진다는 것이다. 툴바에서 아이콘을 눌렀을 때 뜨는 작은 창도 하나의 HTML 페이지이고, 다크 모드처럼 화면 색을 바꾸는 기능은 결국 웹 페이지에 CSS를 한 겹 덧입히는 일이다.</p>
+      <p>즉, 확장 프로그램은 낯선 기술이 아니다. 웹 페이지를 만드는 재료로 브라우저 자체를 꾸미는 일. 이 책이 확장 프로그램을 '코디'라는 말로 설명하는 이유다.</p>
+    </div>
+    <div class="pull"><span class="q">“</span>플러그인은 옷 속에 꿰매 넣은 부품, 확장 프로그램은 언제든 뗄 수 있는 브로치에 가깝다.<span class="q">”</span></div>
+    <div class="vs">
+      <div>
+        <span class="kicker">Then · 과거</span>
+        <h4>플러그인 (Plug-in)</h4>
+        <ul>
+          <li>브라우저 밖에서 만든 별도 프로그램</li>
+          <li>예: 플래시 플레이어, 자바 애플릿</li>
+          <li>컴퓨터 깊은 곳까지 접근 → 보안 위험 큼</li>
+          <li>현재 주요 브라우저에서 지원 종료</li>
+        </ul>
+      </div>
+      <div>
+        <span class="kicker red-t">Now · 현재</span>
+        <h4>확장 프로그램 (Extension)</h4>
+        <ul>
+          <li>HTML · CSS · 자바스크립트로 제작</li>
+          <li>예: 광고 차단, 다크 모드, 번역</li>
+          <li>브라우저가 정한 권한 안에서만 동작</li>
+          <li>공식 스토어에서 설치·삭제가 간편</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span><b>04</b> · What is a plug-in?</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 05 BASICS: ANATOMY ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">01 · Look Breakdown</span><span class="sec">The Basics</span></header>
+    <h2>한 벌의 해부도</h2>
+    <p class="deck">옷 한 벌에 라벨, 겉감, 안감이 있듯 확장 프로그램도 몇 개의 부품으로 이루어진다. 아이콘 하나 뒤에 숨은 구조를 펼쳐 보자.</p>
+
+    <div class="anatomy">
+      <div class="browser">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">https://lecture.example.ac.kr</span><span class="ext" style="background:#A8231C">E</span></div>
+        <div style="padding:5mm">
+          <div class="mock-line" style="width:50%;height:4mm;background:#DCD3C7"></div>
+          <div class="mock-line" style="width:92%"></div><div class="mock-line" style="width:84%"></div><div class="mock-line" style="width:88%"></div>
+          <div class="mock-line" style="width:70%"></div><div class="mock-line" style="width:90%"></div><div class="mock-line" style="width:64%"></div>
+          <div style="height:20mm;background:#EFE7DD;border-radius:1mm;margin-top:3mm"></div>
+        </div>
+        <div class="overlay"></div>
+        <div class="popup">
+          <div class="ttl">MY EXTENSION</div>
+          <div class="sw"><span>다크 모드</span><span class="tg"></span></div>
+          <div class="sw"><span>글꼴 확대</span><span class="tg" style="background:#ccc"></span></div>
+        </div>
+      </div>
+      <span class="pin" style="left:136mm;top:3mm">1</span>
+      <span class="pin" style="left:144mm;top:29mm">2</span>
+      <span class="pin" style="left:36mm;top:62mm">3</span>
+      <span class="pin" style="left:122mm;top:96mm">4</span>
+
+      <div class="callout" style="right:0;top:52mm;width:30mm"><span class="no">2</span><b>팝업</b><br>아이콘을 누르면 열리는 작은 HTML 창. 옷의 겉감처럼 사용자가 직접 만지는 부분.</div>
+      <div class="callout" style="left:0;top:2mm;width:31mm"><span class="no">1</span><b>아이콘 · 매니페스트</b><br><code>manifest.json</code>은 옷의 라벨. 이름, 버전, 필요한 권한이 모두 적혀 있다.</div>
+      <div class="callout" style="left:0;top:72mm;width:31mm"><span class="no">3</span><b>콘텐츠 스크립트</b><br>방문한 웹 페이지 안에 들어가 CSS·JS를 덧입힌다. 점선 영역이 그 무대.</div>
+      <div class="callout" style="right:0;top:92mm;width:30mm"><span class="no">4</span><b>서비스 워커</b><br>보이지 않는 안감. 백그라운드에서 알림, 탭 관리 등을 처리한다.</div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <div class="cap">① 라벨 — manifest.json</div>
+<div class="code">{
+  <span class="k">"manifest_version"</span>: 3,
+  <span class="k">"name"</span>: <span class="s">"My Dark Mode"</span>,
+  <span class="k">"version"</span>: <span class="s">"1.0"</span>,
+  <span class="k">"permissions"</span>: [<span class="s">"storage"</span>],
+  <span class="k">"action"</span>: { <span class="k">"default_popup"</span>: <span class="s">"popup.html"</span> },
+  <span class="k">"content_scripts"</span>: [{
+    <span class="k">"matches"</span>: [<span class="s">"https://*.ac.kr/*"</span>],
+    <span class="k">"css"</span>: [<span class="s">"dark.css"</span>]
+  }]
+}</div>
+      </div>
+      <div>
+        <div class="cap">② 겉감 — popup.html</div>
+<div class="code"><span class="c">&lt;!-- 수업에서 배운 입력 양식 태그 그대로 --&gt;</span>
+&lt;<span class="k">form</span>&gt;
+  &lt;<span class="k">fieldset</span>&gt;
+    &lt;<span class="k">legend</span>&gt;화면 설정&lt;/<span class="k">legend</span>&gt;
+    &lt;<span class="k">input</span> id=<span class="s">"dark"</span> type=<span class="s">"checkbox"</span>&gt;
+    &lt;<span class="k">label</span> for=<span class="s">"dark"</span>&gt;다크 모드&lt;/<span class="k">label</span>&gt;
+  &lt;/<span class="k">fieldset</span>&gt;
+&lt;/<span class="k">form</span>&gt;</div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span><b>05</b> · Look Breakdown</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 06 BASICS: HOW IT STYLES ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">01 · Styling Principle</span><span class="sec">The Basics</span></header>
+    <h2>같은 페이지, 다른 착장</h2>
+    <p class="deck">확장 프로그램은 웹 페이지의 원본을 바꾸지 않는다. 내 브라우저에서 보일 때만 그 위에 한 겹을 덧입힌다. 광고 차단과 다크 모드를 함께 착용한 전후를 비교해 보자.</p>
+
+    <div class="ba">
+      <div>
+        <div class="tag">BEFORE</div>
+        <div class="browser">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">news.example.com</span></div>
+          <div class="site">
+            <h5>오늘의 웹 트렌드</h5>
+            <div class="ad">AD · 지금 클릭하세요!</div>
+            <div class="mock-line" style="width:92%"></div><div class="mock-line" style="width:84%"></div><div class="mock-line" style="width:88%"></div>
+            <div class="ad">AD · 특가 99% 할인</div>
+            <div class="mock-line" style="width:75%"></div><div class="mock-line" style="width:60%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="after">
+        <div class="tag red-t">AFTER · 광고 차단 + 다크 모드</div>
+        <div class="browser">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">news.example.com</span><span class="ext" style="background:#A8231C">U</span><span class="ext" style="background:#555">D</span></div>
+          <div class="site">
+            <h5>오늘의 웹 트렌드</h5>
+            <div class="mock-line" style="width:92%"></div><div class="mock-line" style="width:84%"></div><div class="mock-line" style="width:88%"></div>
+            <div class="mock-line" style="width:75%"></div><div class="mock-line" style="width:90%"></div><div class="mock-line" style="width:66%"></div>
+            <div class="mock-line" style="width:80%"></div><div class="mock-line" style="width:58%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2" style="margin-top:7mm">
+      <div>
+        <div class="cap">다크 모드의 원리 — CSS 덧입히기</div>
+<div class="code"><span class="c">/* 전체 선택자·태그 선택자로 색을 뒤집는다 */</span>
+<span class="k">body</span> { background-color: <span class="s">#121212</span>;
+       color: <span class="s">#E8E2D8</span>; }
+<span class="k">a</span> { color: <span class="s">#E3A79F</span>; text-decoration: none; }
+<span class="k">a:hover</span> { color: <span class="s">#ffffff</span>; }</div>
+      </div>
+      <div>
+        <div class="cap">광고 차단의 원리 — 숨기기</div>
+<div class="code"><span class="c">/* 속성 선택자로 광고 영역을 골라 */</span>
+<span class="k">div[class*="ad-banner"]</span>,
+<span class="k">iframe[src*="ads"]</span> {
+  display: <span class="s">none</span>;  <span class="c">/* 가시 속성 */</span>
+}</div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <article><div class="n">i.</div><h4>덧입히기</h4><p>콘텐츠 스크립트가 페이지에 CSS를 추가한다. 선택자로 대상을 고르고 속성으로 모양을 바꾸는, 수업 시간의 바로 그 방식이다.</p></article>
+      <article><div class="n">ii.</div><h4>덜어내기</h4><p>필요 없는 요소는 <code>display: none</code>으로 감춘다. 광고 차단은 '빼는 코디'의 대표 주자.</p></article>
+      <article><div class="n">iii.</div><h4>되돌리기</h4><p>확장 프로그램을 끄면 원래 모습으로 돌아온다. 원본 사이트는 그대로이고, 내 화면만 달라진다.</p></article>
+    </div>
+  </div>
+  <div class="folio"><span><b>06</b> · Styling Principle</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 07 OPENER 2 ======================= -->
+<section class="page opener" id="curation" style="background:var(--blush)">
+  <div class="label kicker" style="color:var(--red)">Chapter 02 · The Curation</div>
+  <div class="huge" style="right:-6mm;top:6mm;font-size:250pt;color:#DCC3B6">02</div>
+  <div style="position:absolute;left:15mm;top:66mm;display:grid;grid-template-columns:repeat(3,26mm);gap:5mm">
+    <div style="height:26mm;border-radius:7mm;background:#A8231C;box-shadow:0 2mm 4mm rgba(0,0,0,.2)"></div>
+    <div style="height:26mm;border-radius:7mm;background:#23304A;box-shadow:0 2mm 4mm rgba(0,0,0,.2)"></div>
+    <div style="height:26mm;border-radius:7mm;background:#151413;box-shadow:0 2mm 4mm rgba(0,0,0,.2)"></div>
+    <div style="height:26mm;border-radius:7mm;background:#5E6447;box-shadow:0 2mm 4mm rgba(0,0,0,.2)"></div>
+    <div style="height:26mm;border-radius:7mm;background:#B4875A;box-shadow:0 2mm 4mm rgba(0,0,0,.2)"></div>
+    <div style="height:26mm;border-radius:7mm;background:#fff;box-shadow:0 2mm 4mm rgba(0,0,0,.2)"></div>
+  </div>
+  <div class="title">
+    <div class="en" style="color:var(--red)">Editor's essentials</div>
+    <h2>나만의 필수<br>확장 프로그램 큐레이션</h2>
+    <p>유행을 좇아 열 개를 다는 대신, 매일 손이 가는 여섯 개만. 에디터의 데일리 액세서리 박스를 공개한다.</p>
+  </div>
+  <div class="folio"><span><b>07</b> · Chapter 02</span><span>The Curation</span></div>
+</section>
+
+<!-- ======================= 08 LOOKBOOK 1 ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">02 · Lookbook — Daily</span><span class="sec">The Curation</span></header>
+
+    <article class="look">
+      <div class="visual" style="--c:#A8231C">
+        <span class="no">01</span>
+        <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48"><path d="M24 5 L40 11 V24 C40 33 33 40 24 43 C15 40 8 33 8 24 V11 Z" fill="#A8231C"/><text x="24" y="30" font-family="Inter" font-weight="800" font-size="16" fill="#fff" text-anchor="middle">u</text></svg></div>
+        <div class="kw">MINIMAL</div>
+      </div>
+      <div>
+        <div class="cat">광고 차단 · Ad Blocker</div>
+        <h3>uBlock Origin Lite</h3>
+        <div class="style">“모든 코디의 기본, 깨끗한 흰 셔츠”</div>
+        <p>화면을 어지럽히는 광고와 추적 스크립트를 걷어낸다. 페이지가 가벼워져 로딩도 빨라진다. 크롬은 새 확장 규격(Manifest V3)으로 바뀌면서 기존 uBlock Origin 대신 <b>Lite</b> 버전을 제공하며, 파이어폭스에서는 기존 버전을 그대로 쓸 수 있다.</p>
+        <div class="spec"><span>무료 · 오픈소스</span><span>Chrome · Edge · Firefox</span></div>
+        <div class="note">코디 팁: 학교 포털처럼 광고 차단 때문에 기능이 깨지는 사이트는 '이 사이트에서 끄기'로 예외 처리.</div>
+      </div>
+    </article>
+
+    <article class="look">
+      <div class="visual" style="--c:#23304A">
+        <span class="no">02</span>
+        <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48"><rect x="12" y="21" width="24" height="18" rx="3" fill="#23304A"/><path d="M17 21 V16 a7 7 0 0 1 14 0 V21" stroke="#23304A" stroke-width="3.5" fill="none"/><circle cx="24" cy="30" r="2.6" fill="#fff"/></svg></div>
+        <div class="kw">SECURE</div>
+      </div>
+      <div>
+        <div class="cat">비밀번호 관리 · Password Manager</div>
+        <h3>Bitwarden</h3>
+        <div class="style">“어디에나 어울리는 트렌치코트”</div>
+        <p>사이트마다 다른, 길고 복잡한 비밀번호를 대신 만들고 기억해 준다. 하나의 마스터 비밀번호만 기억하면 된다. 코드가 공개된 오픈소스라 많은 사람의 검증을 거쳤고, 개인 사용자는 무료로 쓸 수 있다.</p>
+        <div class="spec"><span>무료 플랜</span><span>오픈소스</span><span class="warn">마스터 비밀번호 분실 주의</span></div>
+        <div class="note">코디 팁: 브라우저 자체 비밀번호 저장 기능과 중복으로 켜지 말 것. 하나만 정해 일관되게.</div>
+      </div>
+    </article>
+
+    <article class="look">
+      <div class="visual" style="--c:#151413">
+        <span class="no">03</span>
+        <div class="icon" style="background:#2b2a28"><svg width="48" height="48" viewBox="0 0 48 48"><path d="M30 10 a15 15 0 1 0 9 25 a12 12 0 0 1 -9 -25 Z" fill="#E8D6CC"/></svg></div>
+        <div class="kw">NOIR</div>
+      </div>
+      <div>
+        <div class="cat">다크 모드 · Dark Mode</div>
+        <h3>Dark Reader</h3>
+        <div class="style">“밤에 빛나는 블랙 원피스”</div>
+        <p>어두운 테마가 없는 사이트까지 검은 배경으로 바꿔 준다. 밝기·대비·세피아 정도를 직접 조절할 수 있어 늦은 밤 과제할 때 눈이 편하다. 앞 장에서 본 'CSS 덧입히기'의 가장 좋은 예.</p>
+        <div class="spec"><span>무료</span><span>Chrome · Edge · Firefox · Safari</span><span class="warn">모든 사이트 접근 권한 필요</span></div>
+        <div class="note">코디 팁: 넓은 권한이 필요한 대표 사례. 그래서 더더욱 공식 스토어의 원본인지 확인하고 설치한다(→ Chapter 03).</div>
+      </div>
+    </article>
+  </div>
+  <div class="folio"><span><b>08</b> · Lookbook — Daily</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 09 LOOKBOOK 2 ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">02 · Lookbook — Study &amp; Design</span><span class="sec">The Curation</span></header>
+
+    <article class="look">
+      <div class="visual" style="--c:#5E6447">
+        <span class="no">04</span>
+        <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48"><rect x="7" y="10" width="20" height="16" rx="3" fill="#5E6447"/><text x="17" y="22" font-family="Noto Sans CJK KR" font-weight="900" font-size="11" fill="#fff" text-anchor="middle">가</text><rect x="21" y="22" width="20" height="16" rx="3" fill="#B4875A"/><text x="31" y="34" font-family="Inter" font-weight="800" font-size="11" fill="#fff" text-anchor="middle">A</text></svg></div>
+        <div class="kw">GLOBAL</div>
+      </div>
+      <div>
+        <div class="cat">번역 · Translate</div>
+        <h3>Google 번역</h3>
+        <div class="style">“해외 자료 앞에서 두르는 실크 스카프”</div>
+        <p>수업 중 해외 사이트를 번역해서 보는 일이 잦다면 필수. 단어나 문장을 드래그하면 바로 뜻이 보이고, 페이지 전체를 한 번에 번역할 수도 있다. 영어 원문 문서와 번역본을 오가며 읽기에 좋다.</p>
+        <div class="spec"><span>무료</span><span>Chrome · Edge</span></div>
+        <div class="note">코디 팁: 크롬은 페이지 번역이 기본 내장이다. 단어 단위 번역이 필요할 때만 추가하자. 겹치는 액세서리는 빼는 게 원칙.</div>
+      </div>
+    </article>
+
+    <article class="look">
+      <div class="visual" style="--c:#B4875A">
+        <span class="no">05</span>
+        <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48"><path d="M33 8 l7 7 -5 5 -7 -7 Z" fill="#151413"/><path d="M28 13 l7 7 -16 16 -6 2 -2 -1 2 -6 Z" fill="#B4875A"/><circle cx="12" cy="38" r="3" fill="#A8231C"/></svg></div>
+        <div class="kw">PALETTE</div>
+      </div>
+      <div>
+        <div class="cat">컬러 피커 · Color Picker</div>
+        <h3>ColorZilla</h3>
+        <div class="style">“디자이너의 가방 속 컬러 칩”</div>
+        <p>웹 페이지 어디든 클릭하면 그 색상의 코드(#A8231C 같은 HEX, RGB)를 알려 준다. CSS 색상 단위를 배우는 우리에게 딱 맞는 도구. 마음에 드는 사이트의 색을 뽑아 내 과제의 팔레트로 쓸 수 있고, 그레이디언트 생성기도 들어 있다.</p>
+        <div class="spec"><span>무료</span><span>Chrome · Firefox</span></div>
+        <div class="note">코디 팁: 뽑아낸 색은 <code>background-color</code>, <code>linear-gradient()</code>에 바로 붙여 넣어 실습해 보자.</div>
+      </div>
+    </article>
+
+    <article class="look">
+      <div class="visual" style="--c:#2E2B28">
+        <span class="no">06</span>
+        <div class="icon"><svg width="48" height="48" viewBox="0 0 48 48"><text x="24" y="33" font-family="Noto Serif CJK KR" font-weight="900" font-size="26" fill="#151413" text-anchor="middle">Aa</text><rect x="10" y="37" width="28" height="2.5" fill="#A8231C"/></svg></div>
+        <div class="kw">TYPE</div>
+      </div>
+      <div>
+        <div class="cat">폰트 식별 · Font Finder</div>
+        <h3>WhatFont</h3>
+        <div class="style">“스타일의 완성, 타이포그래피 안목”</div>
+        <p>글자 위에 마우스를 올리면 그 글자의 글꼴 이름, 크기, 줄 간격, 색상을 바로 보여 준다. 개발자 도구를 열지 않아도 <code>font-family</code>와 <code>font-size</code>가 어떻게 쓰였는지 알 수 있어 웹 디자인 공부에 좋다.</p>
+        <div class="spec"><span>무료</span><span>Chrome · Edge</span></div>
+        <div class="note">코디 팁: 평소엔 꺼 두고 디자인 리서치할 때만 켜기. 쓸 때만 꺼내 드는 클러치 백처럼.</div>
+      </div>
+    </article>
+  </div>
+  <div class="folio"><span><b>09</b> · Lookbook — Study &amp; Design</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 10 TPO ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">02 · TPO Styling</span><span class="sec">The Curation</span></header>
+    <h2>상황별 코디 공식</h2>
+    <p class="deck">액세서리는 한꺼번에 다 하는 것이 아니다. 시간과 장소, 상황(TPO)에 맞춰 켜고 끄는 것까지가 코디다.</p>
+
+    <table class="tpo">
+      <thead><tr><th>상황 (TPO)</th><th>아이템</th><th>왜 이 조합인가</th></tr></thead>
+      <tbody>
+        <tr><th rowspan="2">웹디자인<br>수업 · 실습</th><td class="it">ColorZilla</td><td>참고 사이트에서 색을 추출해 CSS 색상 값으로 바로 활용</td></tr>
+        <tr><td class="it">WhatFont</td><td>글꼴·크기·줄 간격을 확인하며 글자 속성을 분석</td></tr>
+        <tr><th rowspan="2">자료 조사 ·<br>과제 작성</th><td class="it">Google 번역</td><td>해외 문서를 빠르게 훑고 원문과 대조</td></tr>
+        <tr><td class="it">uBlock Origin Lite</td><td>광고 없는 화면에서 집중력 유지</td></tr>
+        <tr><th>로그인 · 결제</th><td class="it">Bitwarden</td><td>사이트마다 다른 비밀번호를 안전하게 자동 입력</td></tr>
+        <tr><th>늦은 밤 브라우징</th><td class="it">Dark Reader</td><td>밝은 흰 화면 대신 어두운 배경으로 눈의 피로 완화</td></tr>
+      </tbody>
+    </table>
+
+    <div class="rules">
+      <div><div class="n">5</div><h4>다섯 개를 넘기지 않는다</h4><p>확장 프로그램이 늘수록 브라우저는 느려지고, 내 정보에 접근하는 손도 늘어난다. 진짜 매일 쓰는 것만.</p></div>
+      <div><div class="n">1</div><h4>같은 역할은 하나만</h4><p>광고 차단 두 개, 번역 두 개는 겹쳐 입은 코트와 같다. 충돌하고 무겁기만 하다.</p></div>
+      <div><div class="n">0</div><h4>안 쓰면 바로 뺀다</h4><p>한 달 동안 한 번도 누르지 않았다면 정리 대상. 서랍 속 액세서리는 위험 요소일 뿐이다.</p></div>
+    </div>
+
+    <p style="margin-top:7mm;font-family:var(--serif);font-size:10pt;line-height:1.7">“좋은 코디는 무엇을 더했는지가 아니라 무엇을 뺐는지에서 드러난다.” 다음 장에서는 애초에 옷장에 들이면 안 되는 아이템을 가려내는 법을 알아본다.</p>
+  </div>
+  <div class="folio"><span><b>10</b> · TPO Styling</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 11 OPENER 3 ======================= -->
+<section class="page opener red" id="redflags">
+  <div class="label kicker" style="color:#F4D3CE">Chapter 03 · Red Flags</div>
+  <div class="huge" style="right:-6mm;top:6mm;font-size:250pt;color:#B8352D">03</div>
+  <div style="position:absolute;left:15mm;top:68mm;width:0;height:0;border-left:38mm solid transparent;border-right:38mm solid transparent;border-bottom:66mm solid #fff;"></div>
+  <div style="position:absolute;left:49.5mm;top:94mm;width:7mm;height:24mm;background:var(--red);border-radius:3mm"></div>
+  <div style="position:absolute;left:49.5mm;top:122mm;width:7mm;height:7mm;background:var(--red);border-radius:50%"></div>
+  <div class="title">
+    <div class="en" style="color:#F4D3CE">Before you click “Add”</div>
+    <h2>확장 프로그램<br>설치 전 확인할 위험 신호</h2>
+    <p>워스트 드레서는 대부분 '예뻐 보여서' 산 하나에서 시작된다. 설치 버튼 앞에서 멈춰야 할 일곱 가지 신호.</p>
+  </div>
+  <div class="folio"><span><b>11</b> · Chapter 03</span><span>Red Flags</span></div>
+</section>
+
+<!-- ======================= 12 RED FLAGS 1-4 ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">03 · Red Flags 01–04</span><span class="sec">Red Flags</span></header>
+
+    <div class="flag">
+      <div class="n">01</div>
+      <div>
+        <h3>기능에 비해 과한 권한</h3>
+        <span class="sig">신호: “모든 웹사이트의 데이터 읽기 및 변경”</span>
+        <p>설치 버튼을 누르면 브라우저가 이 확장 프로그램이 요구하는 권한을 보여 준다. 다크 모드처럼 모든 페이지에 스타일을 입혀야 하는 도구라면 넓은 권한이 이해된다. 하지만 계산기, 시계, 배경화면 같은 단순한 도구가 모든 사이트의 데이터와 방문 기록까지 요구한다면 그건 옷 사이즈가 맞지 않는 것이다.</p>
+        <div class="perm">
+          <div class="pt">“예쁜 시계 위젯”을 추가하시겠습니까?</div>
+          <ul><li><b class="red-t">모든 웹사이트에 있는 사용자의 데이터 읽기 및 변경</b></li><li><b class="red-t">방문 기록 읽기</b></li><li>알림 표시</li></ul>
+          <div class="btns"><span>취소</span><span>확장 프로그램 추가</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flag">
+      <div class="n">02</div>
+      <div>
+        <h3>얼굴 없는 디자이너</h3>
+        <span class="sig">신호: 개발자 웹사이트·연락처·개인정보처리방침이 없음</span>
+        <p>믿을 만한 브랜드는 라벨에 이름과 주소를 남긴다. 스토어 상세 페이지에서 개발자 이름을 누르고, 공식 웹사이트와 개인정보처리방침이 있는지 확인하자. 수집하는 데이터를 밝히지 않는 확장 프로그램은 입지 않는 편이 낫다.</p>
+      </div>
+    </div>
+
+    <div class="flag">
+      <div class="n">03</div>
+      <div>
+        <h3>유명 브랜드를 닮은 짝퉁</h3>
+        <span class="sig">신호: 인기 앱 이름 + “Pro”, “Plus”, “2026” 같은 꼬리표</span>
+        <p>인기 있는 확장 프로그램의 이름과 아이콘을 살짝 바꿔 올린 복제품이 있다. 이름만 보고 고르지 말고, 사용자 수와 개발자 이름이 공식 웹사이트에서 안내하는 것과 같은지 대조한다. 가장 안전한 방법은 공식 홈페이지에 걸린 스토어 링크로 들어가 설치하는 것.</p>
+      </div>
+    </div>
+
+    <div class="flag">
+      <div class="n">04</div>
+      <div>
+        <h3>어색한 평판</h3>
+        <span class="sig">신호: 사용자는 적은데 별 다섯 개 리뷰만 잔뜩</span>
+        <p>한두 줄짜리 비슷한 칭찬 리뷰가 같은 시기에 몰려 있다면 의심하자. 별점이 낮은 리뷰부터 읽어 보는 습관이 도움이 된다. “설치 후 광고가 늘었다”, “검색 엔진이 바뀌었다” 같은 후기는 그 자체로 경고다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span><b>12</b> · Red Flags 01–04</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 13 RED FLAGS 5-7 + BEST/WORST ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">03 · Red Flags 05–07</span><span class="sec">Red Flags</span></header>
+
+    <div class="flag">
+      <div class="n">05</div>
+      <div>
+        <h3>정식 매장 밖에서 파는 옷</h3>
+        <span class="sig">신호: “파일(.crx)을 받아 직접 설치하세요”, “개발자 모드를 켜세요”</span>
+        <p>공식 스토어는 등록 전에 검토를 거친다. 블로그나 메신저로 받은 설치 파일, 개발자 모드를 켜라는 안내는 그 검토를 건너뛰는 길이다. 수업 실습으로 내가 직접 만든 확장 프로그램을 시험할 때가 아니라면 따르지 않는다.</p>
+      </div>
+    </div>
+
+    <div class="flag">
+      <div class="n">06</div>
+      <div>
+        <h3>멈춘 시계, 바뀐 주인</h3>
+        <span class="sig">신호: 몇 년째 업데이트 없음 · 갑자기 개발자 이름이 바뀜</span>
+        <p>오래 방치된 확장 프로그램은 보안 구멍이 막히지 않은 채로 남는다. 반대로 인기 확장 프로그램이 다른 회사에 팔린 뒤 업데이트로 광고나 추적 코드가 끼어드는 사례도 있다. 스토어의 '업데이트 날짜'와 '개발자'를 가끔 다시 확인하자.</p>
+      </div>
+    </div>
+
+    <div class="flag">
+      <div class="n">07</div>
+      <div>
+        <h3>너무 좋은 약속</h3>
+        <span class="sig">신호: “무료 무제한 VPN”, “모든 영상 다운로드”, “유료 기능 공짜로”</span>
+        <p>공짜로 많은 것을 준다는 말 뒤에는 대가가 있다. 대개 그 대가는 내 방문 기록과 개인 정보다. 약속이 클수록 권한 목록과 개인정보처리방침을 더 꼼꼼하게 본다.</p>
+      </div>
+    </div>
+
+    <div class="dresser">
+      <div class="listing best">
+        <span class="stamp">BEST</span>
+        <div class="hd"><div class="ic" style="background:#151413"></div><div><div class="nm">Night Mode Reader</div><div class="by">개발자: 공식 웹사이트 연결됨 ✓</div></div></div>
+        <dl>
+          <dt>사용자</dt><dd>수백만 명</dd>
+          <dt>업데이트</dt><dd>최근 한 달 이내</dd>
+          <dt>권한</dt><dd>기능 설명과 일치</dd>
+          <dt>리뷰</dt><dd>장단점이 고루 섞인 후기</dd>
+          <dt>설치 경로</dt><dd>공식 스토어</dd>
+        </dl>
+      </div>
+      <div class="listing worst">
+        <span class="stamp">WORST</span>
+        <div class="hd"><div class="ic" style="background:repeating-linear-gradient(45deg,#A8231C 0 2mm,#c94a3f 2mm 4mm)"></div><div><div class="nm">Night Mode Reader PRO 2026 FREE</div><div class="by">개발자: 정보 없음</div></div></div>
+        <dl>
+          <dt>사용자</dt><dd class="x">120명</dd>
+          <dt>업데이트</dt><dd class="x">3년 전</dd>
+          <dt>권한</dt><dd class="x">방문 기록, 모든 사이트, 다운로드 관리</dd>
+          <dt>리뷰</dt><dd class="x">“최고예요!!” 5점만 40개</dd>
+          <dt>설치 경로</dt><dd class="x">블로그 첨부 .crx 파일</dd>
+        </dl>
+      </div>
+    </div>
+    <p style="font-size:6.8pt;color:var(--mute);margin-top:2mm">※ 위 두 상품은 설명을 위해 만든 가상의 예시입니다.</p>
+  </div>
+  <div class="folio"><span><b>13</b> · Red Flags 05–07</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 14 CHECKLIST & CARE ======================= -->
+<section class="page article">
+  <div class="pad">
+    <header class="head"><span class="kicker">03 · Fitting Room Checklist</span><span class="sec">Red Flags</span></header>
+    <h2>피팅룸 체크리스트</h2>
+    <p class="deck">옷을 사기 전 거울 앞에 서듯, 설치 버튼을 누르기 전 이 일곱 칸을 채워 보자. 하나라도 비어 있다면 다시 생각할 것.</p>
+
+    <form class="check">
+      <fieldset>
+        <legend>설치 전 확인</legend>
+        <div class="item"><input type="checkbox" id="c1"><label for="c1"><b>공식 스토어</b>에서 설치하는가? (크롬 웹 스토어, Edge 추가 기능, Firefox 부가 기능)</label></div>
+        <div class="item"><input type="checkbox" id="c2"><label for="c2">요구하는 <b>권한</b>이 기능 설명과 맞는가?</label></div>
+        <div class="item"><input type="checkbox" id="c3"><label for="c3"><b>개발자</b>의 웹사이트와 개인정보처리방침이 있는가?</label></div>
+        <div class="item"><input type="checkbox" id="c4"><label for="c4">이름·아이콘이 공식 안내와 <b>정확히 같은가</b>? (짝퉁 주의)</label></div>
+        <div class="item"><input type="checkbox" id="c5"><label for="c5"><b>사용자 수와 리뷰</b>가 자연스러운가? 낮은 별점 리뷰도 읽었는가?</label></div>
+        <div class="item"><input type="checkbox" id="c6"><label for="c6">최근까지 <b>업데이트</b>되고 있는가?</label></div>
+        <div class="item"><input type="checkbox" id="c7"><label for="c7">이미 설치된 것과 <b>역할이 겹치지</b> 않는가?</label></div>
+      </fieldset>
+    </form>
+
+    <div class="care">
+      <article>
+        <h4>세탁 라벨 · 설치 후 관리</h4>
+        <ul>
+          <li>한 달에 한 번 확장 프로그램 관리 화면(크롬은 주소창에 <code>chrome://extensions</code>)을 열어 점검</li>
+          <li>안 쓰는 것은 '사용 중지'보다 '삭제'</li>
+          <li>사이트 접근 권한은 가능하면 '클릭 시'로 제한</li>
+        </ul>
+      </article>
+      <article style="background:#fff;border:.6pt solid var(--red)">
+        <h4 class="red-t">이런 증상이 보이면 즉시 탈의</h4>
+        <ul>
+          <li>새 탭이나 기본 검색 엔진이 저절로 바뀜</li>
+          <li>평소 없던 광고와 팝업이 늘어남</li>
+          <li>브라우저가 갑자기 눈에 띄게 느려짐</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+  <div class="folio"><span><b>14</b> · Fitting Room Checklist</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 15 COLOPHON ======================= -->
+<section class="page colophon" id="colophon">
+  <div class="pad">
+    <header class="head"><span class="kicker">Colophon</span><span class="sec">PLUG·IN Vol.01</span></header>
+    <p class="big" style="margin-top:14mm">브라우저는<br>매일 입는 옷이다.<br><span>그러니 잘 골라 입자.</span></p>
+    <hr class="rule" style="margin-top:12mm">
+    <div class="credits">
+      <dl>
+        <dt>Title</dt><dd>PLUG·IN — 브라우저를 입히는 법</dd>
+        <dt>Theme</dt><dd>패션 코디 × 브라우저 확장 프로그램</dd>
+        <dt>Chapters</dt><dd>플러그인이란 무엇인가<br>나만의 필수 확장 프로그램 큐레이션<br>확장 프로그램 설치 전 확인할 위험 신호</dd>
+      </dl>
+      <dl>
+        <dt>Editor</dt><dd>조서형 (학번 2601981)</dd>
+        <dt>Issue</dt><dd>Vol.01 · 2026 F/W · 중간고사 대체 과제</dd>
+        <dt>Made with</dt><dd>HTML5 시맨틱 태그와 CSS3로 조판 —<br>표지의 일러스트까지 모두 코드로 그렸습니다.</dd>
+        <dt>Typeface</dt><dd>Noto Serif KR · Noto Sans KR · Inter</dd>
+      </dl>
+    </div>
+    <hr class="thin" style="margin-top:10mm">
+    <p style="font-size:7.2pt;color:var(--mute);margin-top:4mm;line-height:1.7">이 책에 소개한 확장 프로그램 정보는 2026년 10월 기준이며, 각 확장 프로그램의 기능·지원 브라우저·가격은 바뀔 수 있습니다. 설치 전에는 반드시 공식 스토어의 최신 정보를 확인하세요. 13쪽의 BEST/WORST 상품은 설명을 위한 가상의 예시입니다.</p>
+  </div>
+  <div class="folio"><span><b>15</b> · Colophon</span><span>PLUG·IN Vol.01</span></div>
+</section>
+
+<!-- ======================= 16 BACK COVER ======================= -->
+<section class="page back">
+  <div style="position:absolute;left:0;right:0;top:80mm;text-align:center">
+    <div style="font-family:var(--serif);font-weight:900;font-size:60pt;letter-spacing:-.03em">PLUG<span style="color:var(--red)">·</span>IN</div>
+    <p style="font-family:var(--serif);font-size:12pt;margin-top:6mm;color:#D8D0C4">더하기 전에, 먼저 확인하기.</p>
+    <div style="display:flex;justify-content:center;gap:3mm;margin-top:14mm">
+      <span style="width:8mm;height:8mm;border-radius:50%;background:#A8231C"></span><span style="width:8mm;height:8mm;border-radius:50%;background:#23304A;border:.4pt solid #555"></span><span style="width:8mm;height:8mm;border-radius:50%;background:#E8D6CC"></span><span style="width:8mm;height:8mm;border-radius:50%;background:#5E6447"></span><span style="width:8mm;height:8mm;border-radius:50%;background:#B4875A"></span>
+    </div>
+  </div>
+  <div style="position:absolute;left:15mm;right:15mm;bottom:14mm;display:flex;justify-content:space-between;font-family:var(--lat);font-size:6.5pt;letter-spacing:.25em;color:#8C857C">
+    <span>VOL.01 — 2026 F/W</span><span>EDITED BY 조서형 · 2601981</span>
+  </div>
+</section>
+
+</body>
+</html>
